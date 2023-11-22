@@ -126,7 +126,7 @@ class HBNBCommand(cmd.Cmd):
                 if type(arg_split[1]) is str:
                     arg_split[1] = arg.split[1].replace("_", " ")
                     arg_split[1] = arg_split[1].replace('"', '\\"')
-                kw[arg_split[0]] = arg_split[1]
+                    kw[arg_split[0]] = arg_split[1]
 
     def help_create(self):
         """ Help information for the create method """
