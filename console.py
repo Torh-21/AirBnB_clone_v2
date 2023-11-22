@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] is '{' and pline[-1] is '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -118,13 +118,14 @@ class HBNBCommand(cmd.Cmd):
         try:
             if not args:
                 raise SyntaxError()
-            args_list  args.split(" ")
+            args_list = args.split(" ")
             kw = {}
             for arg in args_list[1:]:
                 arg_split = arg.split("=")
                 arg_split[1] = eval(arg_split[1])
                 if type(arg_split[1]) is str:
-                    arg_split[1] = arg.split[1].replace("_", " ").replace('"', '\\"')
+                    arg_split[1] = arg.split[1].replace("_", " ")
+                    arg_split[1] = arg_split[1].replace('"', '\\"')
                 kw[arg_split[0]] = arg_split[1]
 
     def help_create(self):
@@ -320,6 +321,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
