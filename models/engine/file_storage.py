@@ -8,7 +8,6 @@ from models.city import City
 from models.amenity import Amenity
 from models.place import Place
 from models.review import Review
-import shelx
 
 
 class FileStorage:
@@ -29,19 +28,14 @@ class FileStorage:
         Return:
             returns a dictionary of __object
         """
-        all_return = {}
-
-        # if cls is valid
-        if cls:
-            dictionary = self.__objects
-            for key in dictionary:
-                partition = key.replace('.', ' ')
-                partition = shlex.split(partition)
-                if (partition[0] == cls.__name__):
-                    dic[key] = self.__objects[key]
-            return (dic)
-        else:
+        if not cls:
             return self.__objects
+        elif type(cls) == str:
+            return {k: v for k, v in self.__objects.items()
+                    if v.__class__.__name__ == cls}
+        else:
+            return {k: v for k, v in self.__objects.items()
+                    if v.__class__ == cls}
 
     def new(self, obj):
         """sets __object to given obj
@@ -64,23 +58,30 @@ class FileStorage:
     def reload(self):
         """serialize the file path to JSON file path
         """
-        try:
-            with open(self.__file_path, 'r', encoding="UTF-8") as f:
-                for key, value in (json.load(f)).items():
-                    value = eval(value["__class__"])(**value)
-                    self.__objects[key] = value
-        except FileNotFoundError:
-            pass
+        if not cls:
+            return self.__objects
+        elif type(cls) == str:
+            return {k: v for k, v in self.__objects.items()
+                    if v.__class__.__name__ == cls}
+        else:
+            return {k: v for k, v in self.__objects.items()
+                    if v.__class__ == cls}
+
+    def delete(self, obj=None):
+        """delete obj from __objects if present
+        """
+        if not cls:
+            return self.__objects
+        elif type(cls) == str:
+            return {k: v for k, v in self.__objects.items()
+                    if v.__class__.__name__ == cls}
+        else:
+            return {k: v for k, v in self.__objects.items()
+                    if v.__class__ == cls}
 
     def close(self):
         """Reload JSON objects
         """
         return self.reload()
 
-    def delete(self, obj=None):
-        """delete obj from __objects if present
-        """
-        if obj:
-            # format key from obj
-            key = "{}.{}".format(type(obj).__name__, obj.id)
-            del self.__objects[key]
+

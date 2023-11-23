@@ -16,8 +16,17 @@ class Review(BaseModel, Base):
         place_id: place id
         user_id: user id
     """
+    if getenv('HBNB_TYPE_STORAGE') == 'db':
+        __tablename__ = "reviews"
+        text = Column(String(1024), nullable=false)
+        place_id = Column(String(60), nullable=false, ForeignKey("places.id"))
+        user_id = Column(String(60), nullable=false, ForeignKey("users.id"))
 
-    __tablename__ = "reviews"
-    text = Column(String(1024), nullable=false)
-    place_id = Column(String(60), nullable=false, ForeignKey("places.id"))
-    user_id = Column(String(60), nullable=false, ForeignKey("users.id"))
+    else:
+        text = ""
+        place_id = ""
+        user_id = ""
+
+    def __init__(self, *args, **kwargs):
+        """initializes Review"""
+        super().__init__(*args, **kwargs)
