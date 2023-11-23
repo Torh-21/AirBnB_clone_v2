@@ -129,7 +129,7 @@ class HBNBCommand(cmd.Cmd):
                     kw[arg_split[0]] = arg_split[1]
 
     def help_create(self):
-        """ Help information for the create method """
+        """Help information for the create method"""
         print("Creates a class of any type")
         print("[Usage]: create <className>\n")
 
