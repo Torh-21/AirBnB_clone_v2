@@ -16,8 +16,9 @@ place_amenity = Table("place_amenity", Base.metadata,
                              primary_key=True,
                              nullable=False))
 
+
 class Place(BaseModel, Base):
-    """ A place to stay 
+    """ A place to stay
     Attributes:
         tablename: the table name
         city_id: city id
@@ -48,7 +49,7 @@ class Place(BaseModel, Base):
 
     if getenv("HBNB_TYPE_STORAGE") == "db":
         reviews = relationship("Review", cascade='all, delete, delete=orphan',
-                               backref="place"
+                               backref="place")
         amenities = relationship("Amenity", secondary=place_amenity,
                                  viewonly=false,
                                  back_populate="place_amenities")
