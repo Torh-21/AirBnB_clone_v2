@@ -40,25 +40,25 @@ class DBStorage:
                                       pool_pre_ping=True)
         # drop tables if test environment
         if getenv('HBNB_ENV') == 'test':
-            Base.metadata.drop_all(self.__engine)
+                Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """Query and return all objects by class/generally
         Return: dictionary (<class-name>.<object-id>: <obj>)
         """
-        if not self.__session:
-            self.reload()
-        objects = {}
-        if type(cls) == str:
-            cls = name2class.get(cls, None)
+        obj_dict = {}
+
         if cls:
-            for obj in self.__session.query(cls):
-                objects[obj.__class__.__name__ + '.' + obj.id] = obj
+            for row in self.__session.query(cls).all():
+                # populate dict with objects from storage
+                obj_dict.update({'{}.{}'.
+                                format(type(cls).__name__, row.id,): row})
         else:
-            for cls in name2class.values():
-                for obj in self.__session.query(cls):
-                    objects[obj.__class__.__name__ + '.' + obj.id] = obj
-        return objects
+            for key, val in all_classes.items():
+                for row in self.__session.query(val):
+                    obj_dict.update({'{}.{}'.
+                                    format(type(row).__name__, row.id,): row})
+        return obj_dict
 
     def new(self, obj):
         """Add object to current database session
@@ -73,10 +73,13 @@ class DBStorage:
     def delete(self, obj=None):
         """Delete obj from database session
         """
-        if not self.__session:
-            self.reload()
         if obj:
-            self.__session.delete(obj)
+            # determine class from obj
+            cls_name = all_classes[type(obj).__name__]
+
+            # query class table and delete
+            self.__session.query(cls_name).\
+                filter(cls_name.id == obj.id).delete()
 
     def reload(self):
         """Create database session
@@ -94,24 +97,3 @@ class DBStorage:
         """Close scoped session
         """
         self.__session.remove()
-
-    def get(self, cls, id):
-        """Retrieve an object"""
-        if cls is not None and type(cls) is str and id is not None and\
-           type(id) is str and cls in name2class:
-            cls = name2class[cls]
-            result = self.__session.query(cls).filter(cls.id == id).first()
-            return result
-        else:
-            return None
-
-    def count(self, cls=None):
-        """Count number of objects in storage"""
-        total = 0
-        if type(cls) == str and cls in name2class:
-            cls = name2class[cls]
-            total = self.__session.query(cls).count()
-        elif cls is None:
-            for cls in name2class.values():
-                total += self.__session.query(cls).count()
-        return total

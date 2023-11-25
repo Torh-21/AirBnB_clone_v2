@@ -28,14 +28,19 @@ class FileStorage:
         Return:
             returns a dictionary of __object
         """
-        if not cls:
-            return self.__objects
-        elif type(cls) == str:
-            return {k: v for k, v in self.__objects.items()
-                    if v.__class__.__name__ == cls}
-        else:
-            return {k: v for k, v in self.__objects.items()
-                    if v.__class__ == cls}
+        all_return = {}
+
+        # if cls is valid
+        if cls:
+            if cls.__name__ in self.all_classes:
+                # copy objects of cls to temp dict
+                for key, val in self.__objects.items():
+                    if key.split('.')[0] == cls.__name__:
+                        all_return.update({key: val})
+        else:  # if cls is none
+            all_return = self.__objects
+
+        return all_return
 
     def new(self, obj):
         """sets __object to given obj
@@ -58,30 +63,24 @@ class FileStorage:
     def reload(self):
         """serialize the file path to JSON file path
         """
-        if not cls:
-            return self.__objects
-        elif type(cls) == str:
-            return {k: v for k, v in self.__objects.items()
-                    if v.__class__.__name__ == cls}
-        else:
-            return {k: v for k, v in self.__objects.items()
-                    if v.__class__ == cls}
-
-    def delete(self, obj=None):
-        """delete obj from __objects if present
-        """
-        if not cls:
-            return self.__objects
-        elif type(cls) == str:
-            return {k: v for k, v in self.__objects.items()
-                    if v.__class__.__name__ == cls}
-        else:
-            return {k: v for k, v in self.__objects.items()
-                    if v.__class__ == cls}
+        try:
+            with open(self.__file_path, 'r', encoding="UTF-8") as f:
+                for key, value in (json.load(f)).items():
+                    value = eval(value["__class__"])(**value)
+                    self.__objects[key] = value
+        except FileNotFoundError:
+            pass
 
     def close(self):
         """Reload JSON objects
         """
         return self.reload()
 
-
+    def delete(self, obj=None):
+        """delete obj from __objects if present
+        """
+        if obj:
+            # format key from obj
+            key = "{}.{}".format(type(obj).__name__, obj.id)
+            del self.__objects[key]
+        self.save()
