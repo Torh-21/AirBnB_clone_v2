@@ -11,9 +11,9 @@ env.hosts = ['34.204.95.25', '54.236.51.166']
 env.user = 'ubuntu'
 env.key_filename = '~/.ssh/school'
 
+
 def do_pack():
     """Function to compress directory
-
     Return: path to archive on success; None on fail
     """
     now = datetime.now()
@@ -26,6 +26,7 @@ def do_pack():
     if result.succeeded:
         return archive_path
     return None
+
 
 def do_deploy(archive_path):
     """Deploy web files to server
